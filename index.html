@@ -390,6 +390,43 @@
     .music-play{transition:none !important;}
     .music-play:hover{transform:none !important;}
   }
+  .music-controls{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .music-nav{
+    width:38px;height:38px;border-radius:50%;
+    background:var(--surface);border:1px solid var(--hairline);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:border-color .2s ease, transform .2s ease;
+  }
+  .music-nav:hover{transform:scale(1.06);border-color:var(--navy);}
+  .music-nav svg{width:16px;height:16px;fill:var(--ink);}
+  .music-playlist{
+    width:100%;display:flex;flex-direction:column;gap:6px;
+    margin-top:4px;
+  }
+  .music-track{
+    display:flex;align-items:center;gap:12px;
+    padding:10px 12px;border-radius:8px;
+    border:1px solid transparent;
+    cursor:pointer;transition:background .15s ease, border-color .15s ease;
+  }
+  .music-track:hover{background:rgba(255,255,255,0.04);}
+  .music-track.active{
+    background:rgba(147,51,234,0.14);
+    border-color:rgba(147,51,234,0.4);
+  }
+  .music-track-num{
+    font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);
+    width:18px;flex-shrink:0;
+  }
+  .music-track.active .music-track-num{color:var(--gold);}
+  .music-track-thumb{
+    width:36px;height:36px;border-radius:6px;object-fit:cover;
+    border:1px solid var(--hairline);flex-shrink:0;
+  }
+  .music-track-thumb-empty{background:rgba(255,255,255,0.04);}
+  .music-track-info{flex:1;min-width:0;}
+  .music-track-title{font-size:14px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .music-track-artist{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
   /* Contact / footer */
   footer{padding:72px 0 48px;}
@@ -614,7 +651,7 @@
 <div class="orb orb2"></div>
 <div class="orb orb3"></div>
 
-<audio id="bg-audio" src="musik.mp3" preload="none" loop></audio>
+<audio id="bg-audio" preload="none" loop></audio>
 
 <div class="topbar">
   <div class="topbar-inner">
@@ -864,17 +901,26 @@ fokus: logic &amp; clean code, Git &amp; GitHub<span class="cursor"></span></div
     </div>
     <div class="music-panel glow-behind">
       <div class="music-thumb-wrap">
-        <img src="https://img.youtube.com/vi/Cs70yKJmUvs/hqdefault.jpg" alt="Thumbnail musik" class="music-thumb" loading="lazy">
+        <img src="https://img.youtube.com/vi/Cs70yKJmUvs/hqdefault.jpg" alt="Thumbnail musik" class="music-thumb" id="music-thumb" loading="lazy">
       </div>
       <div class="music-info">
         <div class="music-label">Now Playing</div>
         <div class="music-title" id="music-title">Memuat judul...</div>
         <div class="music-artist" id="music-artist"></div>
       </div>
-      <button id="music-toggle" class="music-play" aria-label="Putar musik">
-        <svg id="music-icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        <svg id="music-icon-pause" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-      </button>
+      <div class="music-controls">
+        <button id="music-prev" class="music-nav" aria-label="Lagu sebelumnya">
+          <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+        </button>
+        <button id="music-toggle" class="music-play" aria-label="Putar musik">
+          <svg id="music-icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="music-icon-pause" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
+        <button id="music-next" class="music-nav" aria-label="Lagu berikutnya">
+          <svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zm-9.5 6L15 18V6z"/></svg>
+        </button>
+      </div>
+      <div class="music-playlist" id="music-playlist"></div>
     </div>
   </section>
 
@@ -1050,21 +1096,76 @@ fokus: logic &amp; clean code, Git &amp; GitHub<span class="cursor"></span></div
 </script>
 
 <script>
-  var YT_VIDEO_ID = 'Cs70yKJmUvs'; // hanya dipakai untuk ambil judul & thumbnail, bukan untuk main musik
-  var audio = document.getElementById('bg-audio');
+  // Daftar playlist. "src" = nama file mp3 (upload file-nya lewat GitHub dengan nama yang sama).
+  // "ytId" opsional: kalau diisi, judul & thumbnail otomatis diambil dari YouTube.
+  // Kalau ytId dikosongkan, judul/artis dipakai dari "title"/"artist" di bawah ini.
+  var TRACKS = [
+    { src: 'musik.mp3',  ytId: 'Cs70yKJmUvs', title: 'Memuat judul...', artist: '', thumb: '' },
+    { src: 'musik2.mp3', ytId: '', title: 'Lagu 2', artist: '', thumb: 'foto-lagu2.jpg' },
+    { src: 'musik3.mp3', ytId: '', title: 'Lagu 3', artist: '', thumb: 'foto-lagu3.jpg' }
+  ];
 
-  fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=' + YT_VIDEO_ID + '&format=json')
-    .then(function(res){ return res.json(); })
-    .then(function(data){
-      var titleEl = document.getElementById('music-title');
-      var artistEl = document.getElementById('music-artist');
-      if(titleEl) titleEl.textContent = data.title || 'Lagu';
-      if(artistEl) artistEl.textContent = data.author_name || '';
-    })
-    .catch(function(){
-      var titleEl = document.getElementById('music-title');
-      if(titleEl) titleEl.textContent = 'Lagu latar';
+  var audio = document.getElementById('bg-audio');
+  var currentIndex = 0;
+
+  var titleEl = document.getElementById('music-title');
+  var artistEl = document.getElementById('music-artist');
+  var thumbEl = document.getElementById('music-thumb');
+  var playlistEl = document.getElementById('music-playlist');
+
+  function renderPlaylist(){
+    playlistEl.innerHTML = '';
+    TRACKS.forEach(function(track, i){
+      var item = document.createElement('div');
+      item.className = 'music-track' + (i === currentIndex ? ' active' : '');
+      var thumbSrc = track.ytId ? ('https://img.youtube.com/vi/' + track.ytId + '/default.jpg') : (track.thumb || '');
+      item.innerHTML =
+        '<span class="music-track-num">' + (i + 1) + '</span>' +
+        (thumbSrc ? '<img class="music-track-thumb" src="' + thumbSrc + '" alt="">' : '<span class="music-track-thumb music-track-thumb-empty"></span>') +
+        '<span class="music-track-info">' +
+          '<span class="music-track-title">' + (track.title || track.src) + '</span>' +
+          '<span class="music-track-artist">' + (track.artist || '') + '</span>' +
+        '</span>';
+      item.addEventListener('click', function(){ loadTrack(i, true); });
+      playlistEl.appendChild(item);
     });
+  }
+
+  function loadMeta(track){
+    if(!track.ytId){
+      titleEl.textContent = track.title || track.src;
+      artistEl.textContent = track.artist || '';
+      thumbEl.src = track.thumb || '';
+      return;
+    }
+    titleEl.textContent = 'Memuat judul...';
+    artistEl.textContent = '';
+    thumbEl.src = 'https://img.youtube.com/vi/' + track.ytId + '/hqdefault.jpg';
+    fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=' + track.ytId + '&format=json')
+      .then(function(res){ return res.json(); })
+      .then(function(data){
+        track.title = data.title || track.title;
+        track.artist = data.author_name || '';
+        titleEl.textContent = track.title;
+        artistEl.textContent = track.artist;
+        renderPlaylist();
+      })
+      .catch(function(){
+        titleEl.textContent = track.title || 'Lagu latar';
+      });
+  }
+
+  function loadTrack(index, autoplay){
+    var wasPlaying = !audio.paused;
+    currentIndex = (index + TRACKS.length) % TRACKS.length;
+    var track = TRACKS[currentIndex];
+    audio.src = track.src;
+    loadMeta(track);
+    renderPlaylist();
+    if(autoplay || wasPlaying){
+      audio.play().catch(function(){});
+    }
+  }
 
   function updateMusicIcon(playing){
     var btn = document.getElementById('music-toggle');
@@ -1083,6 +1184,7 @@ fokus: logic &amp; clean code, Git &amp; GitHub<span class="cursor"></span></div
 
   audio.addEventListener('play', function(){ updateMusicIcon(true); });
   audio.addEventListener('pause', function(){ updateMusicIcon(false); });
+  audio.addEventListener('ended', function(){ loadTrack(currentIndex + 1, true); });
 
   document.getElementById('music-toggle').addEventListener('click', function(){
     if(audio.paused){
@@ -1091,6 +1193,10 @@ fokus: logic &amp; clean code, Git &amp; GitHub<span class="cursor"></span></div
       audio.pause();
     }
   });
+  document.getElementById('music-prev').addEventListener('click', function(){ loadTrack(currentIndex - 1, true); });
+  document.getElementById('music-next').addEventListener('click', function(){ loadTrack(currentIndex + 1, true); });
+
+  loadTrack(0, false);
 </script>
 </body>
 </html>
