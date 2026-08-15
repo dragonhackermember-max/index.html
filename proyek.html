@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proyek & Indikator Kripto — Taufiq Farhan S.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07040D; --surface:rgba(255,255,255,0.05); --ink:#F3EFFA; --muted:#B9A9D9;
+    --navy:#9333EA; --gold:#D8B4FE; --hairline:rgba(255,255,255,0.14);
+    --up:#22C55E; --down:#F87171; --code-bg:#0D0817;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:linear-gradient(180deg,#05030A 0%,#170A29 100%);background-color:var(--bg);
+    color:var(--ink);font-family:'Inter',sans-serif;line-height:1.6;
+    -webkit-font-smoothing:antialiased;min-height:100vh;
+  }
+  a{color:inherit;text-decoration:none;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .wrap{max-width:960px;margin:0 auto;padding:0 20px;}
+
+  .topbar{border-bottom:1px solid var(--hairline);background:#0D0817;position:sticky;top:0;z-index:20;}
+  .topbar-inner{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;max-width:960px;margin:0 auto;gap:16px;flex-wrap:wrap;}
+  .back-link{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;transition:color .15s;}
+  .back-link:hover{color:var(--navy);}
+
+  .btn{
+    font-size:13px;font-weight:500;padding:9px 16px;border-radius:4px;border:1px solid var(--hairline);
+    cursor:pointer;background:none;color:var(--ink);font-family:'Inter',sans-serif;
+    transition:border-color .15s ease, background .15s ease, transform .15s ease;
+  }
+  .btn:hover{border-color:var(--navy);transform:translateY(-1px);}
+  .btn-primary{background:var(--ink);color:#0A0712;border-color:var(--ink);}
+  .btn-primary:hover{background:var(--navy);border-color:var(--navy);color:var(--ink);}
+  .btn-danger{border-color:rgba(248,113,113,0.4);color:#F87171;}
+  .btn-danger:hover{border-color:#F87171;}
+  .btn-sm{padding:6px 11px;font-size:12px;}
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .btn-fab{
+    width:52px;height:52px;border-radius:50%;font-size:24px;line-height:1;
+    display:flex;align-items:center;justify-content:center;padding:0;
+  }
+
+  .hero{padding:48px 0 30px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+  .eyebrow::before{content:'';width:20px;height:1px;background:var(--gold);}
+  .hero h1{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(30px,5.5vw,44px);line-height:1.1;}
+  .hero p.lede{margin-top:14px;font-size:15.5px;color:var(--muted);max-width:560px;}
+
+  .admin-bar{
+    margin:28px 0 8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+    background:var(--surface);border:1px solid var(--hairline);border-radius:8px;padding:14px 18px;
+  }
+  .admin-bar .status{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--muted);}
+  .admin-bar .status.on{color:var(--up);}
+
+  main{padding:16px 0 80px;}
+  .empty-state{text-align:center;padding:60px 20px;color:var(--muted);border:1px dashed var(--hairline);border-radius:10px;margin-top:24px;}
+
+  /* Project card */
+  .proj-list{display:flex;flex-direction:column;gap:22px;margin-top:24px;}
+  .proj-card{background:var(--surface);border:1px solid var(--hairline);border-radius:12px;overflow:hidden;transition:border-color .18s;}
+  .proj-card:hover{border-color:rgba(147,51,234,0.4);}
+  .proj-header{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    padding:18px 20px;border-bottom:1px solid var(--hairline);
+  }
+  .proj-title-wrap{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .proj-icon{font-size:20px;}
+  .proj-title{font-family:'Fraunces',serif;font-weight:500;font-size:19px;}
+  .badge{
+    font-family:'JetBrains Mono',monospace;font-size:10.5px;padding:3px 9px;border-radius:20px;
+    border:1px solid var(--hairline);color:var(--muted);text-transform:uppercase;letter-spacing:0.04em;
+  }
+  .proj-actions-admin{display:flex;gap:8px;}
+
+  .proj-previews{display:flex;gap:2px;background:var(--hairline);}
+  .preview-cell{flex:1;min-width:0;aspect-ratio:16/10;background:#0A0712;cursor:zoom-in;overflow:hidden;position:relative;}
+  .preview-cell img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s ease;}
+  .preview-cell:hover img{transform:scale(1.04);}
+  .preview-cell.empty{display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;cursor:default;}
+  .preview-cell.empty:hover img{transform:none;}
+
+  .proj-body{display:flex;flex-direction:column;gap:0;}
+  .code-block{padding:16px 20px;border-bottom:1px solid var(--hairline);}
+  .code-block .cb-label{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;}
+  .code-box{
+    background:var(--code-bg);border:1px solid var(--hairline);border-radius:6px;padding:12px 14px;
+    font-family:'JetBrains Mono',monospace;font-size:12px;color:#C4B5FD;overflow:hidden;
+    max-height:110px;position:relative;white-space:pre-wrap;word-break:break-word;
+  }
+  .code-box::after{
+    content:'';position:absolute;left:0;right:0;bottom:0;height:36px;
+    background:linear-gradient(180deg, rgba(13,8,23,0) 0%, var(--code-bg) 100%);
+  }
+  .code-block .expand-btn{margin-top:10px;}
+
+  .proj-desc{padding:16px 20px;}
+  .proj-desc p{font-size:14px;color:var(--muted);margin-bottom:12px;}
+  .tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+  .tag-chip{font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 10px;border-radius:20px;background:rgba(147,51,234,0.14);color:var(--gold);}
+  .link-row{display:flex;gap:10px;flex-wrap:wrap;}
+
+  /* Overlay & modal */
+  .overlay{position:fixed;inset:0;background:rgba(5,3,10,0.8);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:50;padding:20px;}
+  .overlay.show{display:flex;}
+  .modal{background:#150F22;border:1px solid var(--hairline);border-radius:10px;width:100%;max-width:480px;padding:26px;box-shadow:0 30px 60px -20px rgba(0,0,0,0.6);max-height:88vh;overflow-y:auto;}
+  .modal h3{font-family:'Fraunces',serif;font-weight:500;font-size:20px;margin-bottom:18px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;}
+  .field input, .field textarea{
+    width:100%;background:#0D0817;border:1px solid var(--hairline);border-radius:5px;padding:10px 12px;
+    color:var(--ink);font-family:'Inter',sans-serif;font-size:14px;outline:none;transition:border-color .15s;
+  }
+  .field textarea.code-input{font-family:'JetBrains Mono',monospace;font-size:12.5px;}
+  .field input:focus, .field textarea:focus{border-color:var(--navy);}
+  .field textarea{resize:vertical;min-height:60px;}
+  .field-row{display:flex;gap:12px;}
+  .field-row .field{flex:1;}
+  .field-hint{font-size:11.5px;color:var(--muted);margin-top:4px;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
+  .modal-error{color:var(--down);font-size:12.5px;margin-top:-6px;margin-bottom:12px;min-height:16px;}
+
+  /* Fullscreen code viewer */
+  .code-modal .modal{max-width:760px;width:100%;}
+  .code-modal pre{
+    background:var(--code-bg);border:1px solid var(--hairline);border-radius:6px;padding:16px;
+    font-family:'JetBrains Mono',monospace;font-size:12.5px;color:#C4B5FD;
+    max-height:60vh;overflow:auto;white-space:pre-wrap;word-break:break-word;
+  }
+  .code-modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;}
+
+  /* Lightbox */
+  .lightbox-overlay{position:fixed;inset:0;background:rgba(2,1,6,0.92);display:none;align-items:center;justify-content:center;z-index:60;padding:20px;cursor:zoom-out;}
+  .lightbox-overlay.show{display:flex;}
+  .lightbox-overlay img{max-width:100%;max-height:90vh;border-radius:8px;box-shadow:0 30px 70px -20px rgba(0,0,0,0.7);}
+
+  .fab-wrap{position:fixed;right:22px;bottom:22px;z-index:15;}
+
+  .foot-note{margin-top:48px;font-size:12px;color:var(--muted);text-align:center;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="back-link">← Kembali ke Beranda</a>
+    <div class="top-actions" id="top-actions"></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow">portofolio — proyek & indikator</div>
+    <h1>Proyek & Indikator Kripto</h1>
+    <p class="lede">Kumpulan skrip kustom, analisis, dan alat perdagangan yang pernah saya buat.</p>
+  </section>
+
+  <div class="admin-bar">
+    <span class="status mono" id="admin-status">Menghubungkan...</span>
+    <span id="admin-toggle"></span>
+  </div>
+
+  <main>
+    <div class="proj-list" id="proj-list"></div>
+    <div class="empty-state" id="empty-state" style="display:none;">Belum ada proyek. Login sebagai admin untuk menambahkan.</div>
+  </main>
+
+  <p class="foot-note">© 2026 Taufiq — data proyek tersinkron real-time via Firebase.</p>
+</div>
+
+<div class="fab-wrap" id="fab-wrap"></div>
+
+<!-- Login modal -->
+<div class="overlay" id="login-overlay">
+  <div class="modal">
+    <h3>Masuk sebagai Admin</h3>
+    <div class="field"><label>Email</label><input type="email" id="login-email"></div>
+    <div class="field"><label>Password</label><input type="password" id="login-password"></div>
+    <div class="modal-error" id="login-error"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeLogin()">Batal</button>
+      <button class="btn btn-primary" id="login-submit-btn" onclick="tryLogin()">Masuk</button>
+    </div>
+  </div>
+</div>
+
+<!-- Project form modal -->
+<div class="overlay" id="proj-overlay">
+  <div class="modal">
+    <h3 id="proj-modal-title">Tambah Proyek</h3>
+    <input type="hidden" id="proj-id">
+    <div class="field">
+      <label>Icon / Emoji</label>
+      <input type="text" id="proj-icon" placeholder="cth: 📈" maxlength="4">
+    </div>
+    <div class="field">
+      <label>Judul Proyek</label>
+      <input type="text" id="proj-title" placeholder="cth: Pine Script Trend Divergence Indicator">
+    </div>
+    <div class="field">
+      <label>Badge / Kategori</label>
+      <input type="text" id="proj-badge" placeholder="cth: Pine Script">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>URL Foto Preview 1</label>
+        <input type="url" id="proj-img1" placeholder="https://...">
+      </div>
+      <div class="field">
+        <label>URL Foto Preview 2</label>
+        <input type="url" id="proj-img2" placeholder="https://...">
+      </div>
+    </div>
+    <div class="field-hint" style="margin-top:-8px;margin-bottom:14px;">Upload gambar ke folder repo GitHub-mu (mis. /assets/), lalu pakai link mentahnya (raw.githubusercontent.com) di sini.</div>
+    <div class="field">
+      <label>Kode (untuk tampilan penuh saat "Expand Code")</label>
+      <textarea id="proj-code" class="code-input" placeholder="Tempel kode lengkap di sini" rows="6"></textarea>
+    </div>
+    <div class="field">
+      <label>Deskripsi</label>
+      <textarea id="proj-desc" placeholder="Penjelasan singkat tentang proyek ini"></textarea>
+    </div>
+    <div class="field">
+      <label>Tech Tags (pisahkan koma)</label>
+      <input type="text" id="proj-tags" placeholder="cth: Pine Script, TradingView, TA">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Label Link 1</label>
+        <input type="text" id="proj-link1-label" placeholder="cth: Lihat di Github">
+      </div>
+      <div class="field">
+        <label>URL Link 1</label>
+        <input type="url" id="proj-link1-url" placeholder="https://github.com/...">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Label Link 2</label>
+        <input type="text" id="proj-link2-label" placeholder="cth: Lihat di TradingView">
+      </div>
+      <div class="field">
+        <label>URL Link 2</label>
+        <input type="url" id="proj-link2-url" placeholder="https://...">
+      </div>
+    </div>
+    <div class="modal-error" id="proj-error"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeProjModal()">Batal</button>
+      <button class="btn btn-primary" id="proj-submit-btn" onclick="saveProject()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Fullscreen code modal -->
+<div class="overlay code-modal" id="code-overlay">
+  <div class="modal">
+    <div class="code-modal-head">
+      <h3 id="code-modal-title" style="margin:0;">Kode Lengkap</h3>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-sm" id="code-copy-btn">Salin</button>
+        <button class="btn btn-sm" onclick="closeCodeModal()">Tutup</button>
+      </div>
+    </div>
+    <pre id="code-modal-content"></pre>
+  </div>
+</div>
+
+<!-- Image lightbox -->
+<div class="lightbox-overlay" id="lightbox-overlay" onclick="closeLightbox()">
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script type="module">
+  // Menggunakan project Firebase yang sama dengan halaman portofolio crypto.
+  const firebaseConfig = {
+    apiKey: "AIzaSyBL089OO08oyEex389qD7kKtD-sDdLqJSI",
+    authDomain: "portofolio-crypto.firebaseapp.com",
+    projectId: "portofolio-crypto",
+    storageBucket: "portofolio-crypto.firebasestorage.app",
+    messagingSenderId: "493057059694",
+    appId: "1:493057059694:web:8f2e79fea74653f1412f7f"
+  };
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import {
+    getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+  import {
+    getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const projectsCol = collection(db, "projects");
+
+  var isAdmin = false;
+  var currentData = [];
+
+  onSnapshot(projectsCol, function(snapshot){
+    currentData = [];
+    snapshot.forEach(function(d){ currentData.push(Object.assign({ id: d.id }, d.data())); });
+    // urutkan berdasarkan judul biar konsisten
+    currentData.sort(function(a,b){ return (a.order||0) - (b.order||0); });
+    render();
+  }, function(err){
+    document.getElementById('admin-status').textContent = 'Gagal terhubung: ' + err.message;
+  });
+
+  onAuthStateChanged(auth, function(user){
+    isAdmin = !!user;
+    render();
+  });
+
+  function escapeHtml(str){
+    return String(str == null ? '' : str).replace(/[&<>"']/g, function(c){
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
+  }
+
+  function render(){
+    var list = document.getElementById('proj-list');
+    var empty = document.getElementById('empty-state');
+    list.innerHTML = '';
+
+    if(currentData.length === 0){
+      empty.style.display = 'block';
+    } else {
+      empty.style.display = 'none';
+      currentData.forEach(function(item){
+        var tags = (item.tags || '').split(',').map(function(t){ return t.trim(); }).filter(Boolean);
+        var codePreview = (item.code || '').split('\n').slice(0, 6).join('\n');
+
+        var card = document.createElement('div');
+        card.className = 'proj-card';
+        card.innerHTML =
+          '<div class="proj-header">' +
+            '<div class="proj-title-wrap">' +
+              '<span class="proj-icon">' + escapeHtml(item.icon || '📁') + '</span>' +
+              '<span class="proj-title">' + escapeHtml(item.title || 'Tanpa judul') + '</span>' +
+              (item.badge ? '<span class="badge">' + escapeHtml(item.badge) + '</span>' : '') +
+            '</div>' +
+            (isAdmin ? '<div class="proj-actions-admin">' +
+              '<button class="btn btn-sm" data-action="edit" data-id="' + item.id + '">Edit</button>' +
+              '<button class="btn btn-sm btn-danger" data-action="delete" data-id="' + item.id + '">Hapus</button>' +
+            '</div>' : '') +
+          '</div>' +
+          '<div class="proj-previews">' +
+            (item.img1 ?
+              '<div class="preview-cell" data-action="zoom" data-src="' + escapeHtml(item.img1) + '"><img src="' + escapeHtml(item.img1) + '" alt=""></div>' :
+              '<div class="preview-cell empty">Foto Preview 1</div>') +
+            (item.img2 ?
+              '<div class="preview-cell" data-action="zoom" data-src="' + escapeHtml(item.img2) + '"><img src="' + escapeHtml(item.img2) + '" alt=""></div>' :
+              '<div class="preview-cell empty">Foto Preview 2</div>') +
+          '</div>' +
+          '<div class="proj-body">' +
+            '<div class="code-block">' +
+              '<div class="cb-label">Cuplikan Kode</div>' +
+              '<div class="code-box mono">' + escapeHtml(codePreview || '// belum ada kode') + '</div>' +
+              '<button class="btn btn-sm expand-btn" data-action="expand-code" data-id="' + item.id + '">Expand Code</button>' +
+            '</div>' +
+            '<div class="proj-desc">' +
+              '<p>' + escapeHtml(item.desc || '') + '</p>' +
+              (tags.length ? '<div class="tag-row">' + tags.map(function(t){ return '<span class="tag-chip">' + escapeHtml(t) + '</span>'; }).join('') + '</div>' : '') +
+              '<div class="link-row">' +
+                (item.link1Url ? '<a class="btn btn-sm" href="' + escapeHtml(item.link1Url) + '" target="_blank" rel="noopener">' + escapeHtml(item.link1Label || 'Link 1') + '</a>' : '') +
+                (item.link2Url ? '<a class="btn btn-sm btn-primary" href="' + escapeHtml(item.link2Url) + '" target="_blank" rel="noopener">' + escapeHtml(item.link2Label || 'Link 2') + '</a>' : '') +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        list.appendChild(card);
+      });
+    }
+
+    list.querySelectorAll('[data-action="edit"]').forEach(function(btn){
+      btn.addEventListener('click', function(){ openProjModal(btn.dataset.id); });
+    });
+    list.querySelectorAll('[data-action="delete"]').forEach(function(btn){
+      btn.addEventListener('click', function(){ deleteProject(btn.dataset.id); });
+    });
+    list.querySelectorAll('[data-action="zoom"]').forEach(function(el){
+      el.addEventListener('click', function(){ openLightbox(el.dataset.src); });
+    });
+    list.querySelectorAll('[data-action="expand-code"]').forEach(function(btn){
+      btn.addEventListener('click', function(){ openCodeModal(btn.dataset.id); });
+    });
+
+    renderTopBar();
+  }
+
+  function renderTopBar(){
+    var status = document.getElementById('admin-status');
+    var toggle = document.getElementById('admin-toggle');
+    var topActions = document.getElementById('top-actions');
+    var fabWrap = document.getElementById('fab-wrap');
+
+    if(isAdmin){
+      status.textContent = 'Mode: Admin (tersinkron real-time)';
+      status.classList.add('on');
+      toggle.innerHTML = '<button class="btn btn-sm" id="btn-logout-2">Keluar Admin</button>';
+      topActions.innerHTML = '<button class="btn btn-sm" id="btn-logout">Keluar Admin</button>';
+      fabWrap.innerHTML = '<button class="btn btn-primary btn-fab" id="btn-add" title="Tambah Proyek">+</button>';
+      document.getElementById('btn-add').addEventListener('click', function(){ openProjModal(null); });
+      document.getElementById('btn-logout').addEventListener('click', logout);
+      document.getElementById('btn-logout-2').addEventListener('click', logout);
+    } else {
+      status.textContent = 'Mode: Pengunjung';
+      status.classList.remove('on');
+      toggle.innerHTML = '';
+      topActions.innerHTML = '<button class="btn btn-sm" id="btn-admin-login">Masuk Admin</button>';
+      fabWrap.innerHTML = '';
+      document.getElementById('btn-admin-login').addEventListener('click', openLogin);
+    }
+  }
+
+  // --- Login (Firebase Auth, akun sama dengan halaman portofolio)
+  window.openLogin = function(){
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-password').value = '';
+    document.getElementById('login-error').textContent = '';
+    document.getElementById('login-overlay').classList.add('show');
+  };
+  window.closeLogin = function(){ document.getElementById('login-overlay').classList.remove('show'); };
+  window.tryLogin = function(){
+    var email = document.getElementById('login-email').value.trim();
+    var pass = document.getElementById('login-password').value;
+    var btn = document.getElementById('login-submit-btn');
+    var errEl = document.getElementById('login-error');
+    if(!email || !pass){ errEl.textContent = 'Email dan password wajib diisi.'; return; }
+    btn.disabled = true;
+    signInWithEmailAndPassword(auth, email, pass).then(function(){
+      btn.disabled = false; closeLogin();
+    }).catch(function(){
+      btn.disabled = false; errEl.textContent = 'Login gagal: email/password salah.';
+    });
+  };
+  window.logout = function(){ signOut(auth); };
+
+  // --- Project form
+  window.openProjModal = function(id){
+    var item = id ? currentData.find(function(d){ return d.id === id; }) : null;
+    document.getElementById('proj-modal-title').textContent = item ? 'Edit Proyek' : 'Tambah Proyek';
+    document.getElementById('proj-id').value = item ? item.id : '';
+    document.getElementById('proj-icon').value = item ? (item.icon || '') : '';
+    document.getElementById('proj-title').value = item ? (item.title || '') : '';
+    document.getElementById('proj-badge').value = item ? (item.badge || '') : '';
+    document.getElementById('proj-img1').value = item ? (item.img1 || '') : '';
+    document.getElementById('proj-img2').value = item ? (item.img2 || '') : '';
+    document.getElementById('proj-code').value = item ? (item.code || '') : '';
+    document.getElementById('proj-desc').value = item ? (item.desc || '') : '';
+    document.getElementById('proj-tags').value = item ? (item.tags || '') : '';
+    document.getElementById('proj-link1-label').value = item ? (item.link1Label || '') : '';
+    document.getElementById('proj-link1-url').value = item ? (item.link1Url || '') : '';
+    document.getElementById('proj-link2-label').value = item ? (item.link2Label || '') : '';
+    document.getElementById('proj-link2-url').value = item ? (item.link2Url || '') : '';
+    document.getElementById('proj-error').textContent = '';
+    document.getElementById('proj-overlay').classList.add('show');
+  };
+  window.closeProjModal = function(){ document.getElementById('proj-overlay').classList.remove('show'); };
+  window.saveProject = function(){
+    var id = document.getElementById('proj-id').value;
+    var title = document.getElementById('proj-title').value.trim();
+    var errEl = document.getElementById('proj-error');
+    var btn = document.getElementById('proj-submit-btn');
+    if(!title){ errEl.textContent = 'Judul proyek wajib diisi.'; return; }
+
+    var payload = {
+      icon: document.getElementById('proj-icon').value.trim(),
+      title: title,
+      badge: document.getElementById('proj-badge').value.trim(),
+      img1: document.getElementById('proj-img1').value.trim(),
+      img2: document.getElementById('proj-img2').value.trim(),
+      code: document.getElementById('proj-code').value,
+      desc: document.getElementById('proj-desc').value.trim(),
+      tags: document.getElementById('proj-tags').value.trim(),
+      link1Label: document.getElementById('proj-link1-label').value.trim(),
+      link1Url: document.getElementById('proj-link1-url').value.trim(),
+      link2Label: document.getElementById('proj-link2-label').value.trim(),
+      link2Url: document.getElementById('proj-link2-url').value.trim(),
+      order: id ? undefined : Date.now()
+    };
+    if(payload.order === undefined) delete payload.order;
+
+    var docId = id || ('p' + Date.now());
+    btn.disabled = true;
+    setDoc(doc(db, "projects", docId), payload, { merge: true }).then(function(){
+      btn.disabled = false; closeProjModal();
+    }).catch(function(err){
+      btn.disabled = false; errEl.textContent = 'Gagal menyimpan: ' + err.message;
+    });
+  };
+  window.deleteProject = function(id){
+    if(!confirm('Hapus proyek ini?')) return;
+    deleteDoc(doc(db, "projects", id)).catch(function(err){ alert('Gagal menghapus: ' + err.message); });
+  };
+
+  // --- Fullscreen code viewer
+  window.openCodeModal = function(id){
+    var item = currentData.find(function(d){ return d.id === id; });
+    if(!item) return;
+    document.getElementById('code-modal-title').textContent = item.title || 'Kode Lengkap';
+    document.getElementById('code-modal-content').textContent = item.code || '// Belum ada kode untuk proyek ini.';
+    document.getElementById('code-overlay').classList.add('show');
+  };
+  window.closeCodeModal = function(){ document.getElementById('code-overlay').classList.remove('show'); };
+  document.getElementById('code-copy-btn').addEventListener('click', function(){
+    var text = document.getElementById('code-modal-content').textContent;
+    navigator.clipboard.writeText(text).then(function(){
+      var btn = document.getElementById('code-copy-btn');
+      var original = btn.textContent;
+      btn.textContent = 'Tersalin!';
+      setTimeout(function(){ btn.textContent = original; }, 1500);
+    });
+  });
+
+  // --- Lightbox
+  window.openLightbox = function(src){
+    document.getElementById('lightbox-img').src = src;
+    document.getElementById('lightbox-overlay').classList.add('show');
+  };
+  window.closeLightbox = function(){
+    document.getElementById('lightbox-overlay').classList.remove('show');
+    document.getElementById('lightbox-img').src = '';
+  };
+</script>
+</body>
+</html>
